@@ -4,6 +4,7 @@ import requests
 from nonebot.log import logger
 from PIL import Image, ImageSequence
 import os
+from pathlib import Path
 plugin_path = os.path.dirname(os.path.abspath(__file__))
 
 """
@@ -100,7 +101,7 @@ def generate_count_pic(count: int, output_file: str, theme: str = 'random'):
         raise FileNotFoundError(f'未找到主题: {theme}')
 
     # 主题路径
-    theme_dir = f'{plugin_path}/moe-counter/assets/theme/{theme}'
+    theme_dir = Path(f'{plugin_path}/moe-counter/assets/theme/{theme}')
 
     # 数字序列，例如显示 12345
     count_str = str(count)
@@ -115,9 +116,9 @@ def generate_count_pic(count: int, output_file: str, theme: str = 'random'):
 
     # 加载图片函数
     def load_char_image(char):
-        img_file = theme_dir / f"{char}.png"
+        img_file = Path(theme_dir / f"{char}.png")
         if not img_file.exists():
-            img_file = theme_dir / f"{char}.gif"
+            img_file = Path(theme_dir / f"{char}.gif")
         if not img_file.exists():
             raise FileNotFoundError(f"没有找到字符图片: {char}")
 
@@ -130,9 +131,9 @@ def generate_count_pic(count: int, output_file: str, theme: str = 'random'):
     # 准备字符序列
     chars = list(count_str)
     if use_start_end:
-        if (theme_dir / "_start.png").exists() or (theme_dir / "_start.gif").exists():
+        if (theme_dir / Path("_start.png")).exists() or (theme_dir / Path("_start.gif")).exists():
             chars.insert(0, "_start")
-        if (theme_dir / "_end.png").exists() or (theme_dir / "_end.gif").exists():
+        if (theme_dir / Path("_end.png")).exists() or (theme_dir / Path("_end.gif")).exists():
             chars.append("_end")
 
     # 加载所有图片
