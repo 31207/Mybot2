@@ -158,4 +158,4 @@ def generate_count_pic(count: int, output_file: str, theme: str = 'random'):
         x_offset += im.width
 
     # 保存为 GIF
-    canvas.save(output_file, save_all=True, loop=0, duration=100)
+    canvas.save(f'{plugin_path}/{output_file}', save_all=True, loop=0, duration=100)
