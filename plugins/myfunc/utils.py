@@ -1,3 +1,5 @@
+import random
+
 import requests
 from nonebot.log import logger
 from PIL import Image, ImageSequence
@@ -89,3 +91,70 @@ def split_and_mirror_gif(gif_path, output_path, direction:int):
 
     if count!=1: frames[0].save(output_path, save_all=True, append_images=frames[1:], loop=0, duration=durations)
     else: frames[0].save(output_path, save_all=True, append_images=frames[1:], loop=0)
+
+def generate_count_pic(count: int, output_file: str, theme: str = 'random'):
+    folders = os.listdir(f'{plugin_path}/moe-counter/assets/theme/')
+    if theme == 'random':
+        theme = random.choice(folders)
+    if theme not in folders:
+        raise FileNotFoundError(f'未找到主题: {theme}')
+
+    # 主题路径
+    theme_dir = f'{plugin_path}/moe-counter/assets/theme/{theme}'
+
+    # 数字序列，例如显示 12345
+    count_str = str(count)
+    # 可选 _start/_end 图片
+    use_start_end = True
+
+    # 缩放比例
+    scale = 1
+
+    # 对齐方式: 'top', 'center', 'bottom'
+    align = 'top'
+
+    # 加载图片函数
+    def load_char_image(char):
+        img_file = theme_dir / f"{char}.png"
+        if not img_file.exists():
+            img_file = theme_dir / f"{char}.gif"
+        if not img_file.exists():
+            raise FileNotFoundError(f"没有找到字符图片: {char}")
+
+        im = Image.open(img_file)
+        if scale != 1:
+            w, h = im.size
+            im = im.resize((int(w * scale), int(h * scale)), Image.NEAREST)
+        return im
+
+    # 准备字符序列
+    chars = list(count_str)
+    if use_start_end:
+        if (theme_dir / "_start.png").exists() or (theme_dir / "_start.gif").exists():
+            chars.insert(0, "_start")
+        if (theme_dir / "_end.png").exists() or (theme_dir / "_end.gif").exists():
+            chars.append("_end")
+
+    # 加载所有图片
+    images = [load_char_image(c) for c in chars]
+
+    # 计算最终 GIF 尺寸
+    width = sum(im.width for im in images)
+    height = max(im.height for im in images)
+
+    # 创建空白画布
+    canvas = Image.new("RGBA", (width, height), (0, 0, 0, 0))
+
+    # 拼接图片
+    x_offset = 0
+    for im in images:
+        y_offset = 0
+        if align == 'center':
+            y_offset = (height - im.height) // 2
+        elif align == 'bottom':
+            y_offset = height - im.height
+        canvas.paste(im, (x_offset, y_offset), im if im.mode == 'RGBA' else None)
+        x_offset += im.width
+
+    # 保存为 GIF
+    canvas.save(output_file, save_all=True, loop=0, duration=100)

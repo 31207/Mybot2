@@ -35,7 +35,7 @@ command_worship = on_command('膜拜', priority=10, block=False)
 command_point = on_command('指', priority=10, block=False, force_whitespace=' ')
 command_bro = on_command('兄弟', priority=10, block=False, force_whitespace=' ')
 command_shell = on_command('shell', priority=10, block=False, force_whitespace=' ')
-
+command_count = on_command('count', priority=10, block=False, force_whitespace=' ')
 
 @command_i_love_you.handle()
 async def _(event: GroupMessageEvent):
@@ -178,6 +178,18 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()):
         return
     result = subprocess.run(str(arg), shell=True, capture_output=True, text=True)
     await UniMessage.text(f'Stdout:\n{result.stdout}').text(f'Stderr:\n{result.stderr}').text(f'ReturnCode:{result.returncode}').finish()
+
+@command_count.handle()
+async def _(event: GroupMessageEvent, arg: Message = CommandArg()):
+    try:
+        random_name = str(int(random.random() * 100000000))
+        pic_name = 'count_' + random_name + '.gif'
+        path = f"{utils.plugin_path}/moe-counter/{pic_name}"
+        utils.generate_count_pic(int(str(arg)), pic_name)
+        await UniMessage.at(event.get_user_id()).image(raw=utils.get_bytes_from_file(path)).finish()
+    except Exception as e:
+        logger.error(e)
+        await UniMessage.at(event.get_user_id()).text(e).finish()
 
 @echo.handle()
 async def _(event: Event):
