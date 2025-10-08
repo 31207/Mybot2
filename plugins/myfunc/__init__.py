@@ -185,7 +185,8 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()):
         random_name = str(int(random.random() * 100000000))
         pic_name = 'count_' + random_name + '.gif'
         path = f"{utils.plugin_path}/moe-counter/{pic_name}"
-        utils.generate_count_pic(int(arg), pic_name)
+        print(str(arg))
+        utils.generate_count_pic(int(str(arg)), pic_name)
         await UniMessage.at(event.get_user_id()).image(raw=utils.get_bytes_from_file(path)).finish()
     except Exception as e:
         logger.error(e)
