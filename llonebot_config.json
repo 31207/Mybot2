@@ -1,0 +1,43 @@
+{
+  "token": "mm123123",
+  "config": {
+    "webui": {
+      "enable": true,
+      "port": 3080
+    },
+    "onlyLocalhost": false,
+    "satori": {
+      "enable": false,
+      "port": 5600,
+      "token": "mm123123"
+    },
+    "ob11": {
+      "enable": true,
+      "token": "mm123123",
+      "httpPort": 3000,
+      "httpPostUrls": [],
+      "httpSecret": "",
+      "wsPort": 3001,
+      "wsReverseUrls": [
+        "ws://172.17.0.1:3004/onebot/v11/ws"
+      ],
+      "enableHttp": false,
+      "enableHttpPost": false,
+      "enableWs": true,
+      "enableWsReverse": true,
+      "messagePostFormat": "array",
+      "enableHttpHeart": false,
+      "reportSelfMessage": false
+    },
+    "heartInterval": 60000,
+    "enableLocalFile2Url": false,
+    "debug": false,
+    "log": true,
+    "autoDeleteFile": false,
+    "autoDeleteFileSecond": 60,
+    "musicSignUrl": "https://llob.linyuchen.net/sign/music",
+    "msgCacheExpire": 120,
+    "ffmpeg": "/usr/bin/ffmpeg",
+    "receiveOfflineMsg": false
+  }
+}
