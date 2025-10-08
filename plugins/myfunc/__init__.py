@@ -188,7 +188,7 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()):
         print(str(arg))
         utils.generate_count_pic(int(str(arg)), pic_name)
         await UniMessage.at(event.get_user_id()).image(raw=utils.get_bytes_from_file(path)).finish()
-    except Exception as e:
+    except ValueError as e:
         logger.error(e)
         await UniMessage.at(event.get_user_id()).text(e).finish()
 
