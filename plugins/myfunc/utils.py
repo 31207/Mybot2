@@ -1,8 +1,9 @@
+import io
 import random
-
+import string
 import requests
 from nonebot.log import logger
-from PIL import Image, ImageSequence
+from PIL import Image, ImageSequence, ImageDraw, ImageFont, ImageFilter
 import os
 from pathlib import Path
 plugin_path = os.path.dirname(os.path.abspath(__file__))
@@ -159,3 +160,61 @@ def generate_count_pic(count: int, output_file: str, theme: str = 'random'):
 
     # 保存为 GIF
     canvas.save(f'{plugin_path}/moe-counter/{output_file}', save_all=True, loop=0, duration=100)
+
+def random_text(length=5, chars=string.ascii_uppercase + string.digits):
+    return ''.join(random.choice(chars) for _ in range(length))
+
+def generate_captcha_image(text=None, width=160, height=60, fontsz=36):
+    if text is None:
+        text = random_text(5)
+    # 生成背景
+    img = Image.new('RGB', (width, height), (255, 255, 255))
+    draw = ImageDraw.Draw(img)
+
+    # 随机背景色块（轻微变化）
+    for i in range(50):
+        x1 = random.randint(0, width)
+        y1 = random.randint(0, height)
+        x2 = x1 + random.randint(1, 10)
+        y2 = y1 + random.randint(1, 10)
+        draw.rectangle([x1, y1, x2, y2], fill=(random.randint(200,255), random.randint(200,255), random.randint(200,255)))
+
+    # 干扰线
+    for i in range(6):
+        start = (random.randint(0, width), random.randint(0, height))
+        end = (random.randint(0, width), random.randint(0, height))
+        draw.line([start, end], fill=(random.randint(50,160), random.randint(50,160), random.randint(50,160)), width=1)
+
+    # 文字：逐字符绘制，带微小角度与位置偏移
+    try:
+        font = ImageFont.truetype(f'{plugin_path}/msyh.ttc', fontsz)
+    except Exception:
+        font = ImageFont.load_default()
+    char_width = width // len(text)
+    for i, ch in enumerate(text):
+        # 单个字符画到单独图片上以便旋转
+        char_img = Image.new('RGBA', (char_width, height), (255,255,255,0))
+        cd = ImageDraw.Draw(char_img)
+        # 随机颜色（深色）
+        color = (random.randint(10,120), random.randint(10,120), random.randint(10,120))
+        cd.text((5, random.randint(0, 8)), ch, font=font, fill=color)
+        # 旋转
+        angle = random.uniform(-30, 30)
+        char_img = char_img.rotate(angle, resample=Image.BICUBIC, expand=1)
+        # 粘贴回主图（随机Y偏移）
+        px = i * char_width + random.randint(0, max(0, char_width - fontsz))
+        py = random.randint(-5, 10)
+        img.paste(char_img, (px, py), char_img)
+
+    # 加噪点
+    for _ in range(300):
+        x = random.randint(0, width-1)
+        y = random.randint(0, height-1)
+        img.putpixel((x, y), (random.randint(0,255), random.randint(0,255), random.randint(0,255)))
+
+    # 轻微模糊/滤镜处理，让 OCR 更难
+    img = img.filter(ImageFilter.SMOOTH)
+    img = img.filter(ImageFilter.GaussianBlur(0.5))
+    buf = io.BytesIO()
+    img.save(buf, format='PNG')
+    return buf, text

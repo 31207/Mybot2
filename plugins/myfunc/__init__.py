@@ -1,3 +1,5 @@
+import string
+
 from nonebot import get_plugin_config
 from nonebot.plugin import PluginMetadata
 from nonebot import on_command, on_message
@@ -37,6 +39,9 @@ command_bro = on_command('兄弟', priority=10, block=False, force_whitespace=' 
 command_shell = on_command('shell', priority=10, block=False, force_whitespace=' ')
 command_count = on_command('count', priority=10, block=False, force_whitespace=' ')
 command_exec = on_command('exec', priority=10, block=False, force_whitespace=' ')
+command_captcha = on_command('验证码', priority=10, block=False, force_whitespace=' ')
+
+
 @command_i_love_you.handle()
 async def _(event: GroupMessageEvent):
     await command_i_love_you.finish('你喜欢我')
@@ -135,7 +140,7 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()):
     jpg_name = 'jpg_' + random_name
     path = f"{utils.plugin_path}/point/"
     commands = [
-        f'magick convert {path}base.jpg -font {path}msyh.ttc -fill black -pointsize 24 -gravity center -annotate +0+80 "{str(arg)}" {path}{jpg_name}.jpg',
+        f'magick convert {path}base.jpg -font {utils.plugin_path}/msyh.ttc -fill black -pointsize 24 -gravity center -annotate +0+80 "{str(arg)}" {path}{jpg_name}.jpg',
     ]
     # 使用 subprocess 运行命令
     for i in commands:
@@ -160,7 +165,7 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()):
     jpg_name = 'jpg_' + random_name
     path = f"{utils.plugin_path}/bro/"
     commands = [
-        f'magick convert {path}base.jpg -font {path}msyh.ttc -fill black -pointsize 30 -gravity center -annotate +0-100 "{str(arg)}" {path}{jpg_name}.jpg',
+        f'magick convert {path}base.jpg -font {utils.plugin_path}/msyh.ttc -fill black -pointsize 30 -gravity center -annotate +0-100 "{str(arg)}" {path}{jpg_name}.jpg',
     ]
     # 使用 subprocess 运行命令
     for i in commands:
@@ -172,12 +177,15 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()):
             await UniMessage.at(event.get_user_id()).text('指人失败').finish()
     await UniMessage.at(event.get_user_id()).image(raw=utils.get_bytes_from_file(f'{path}{jpg_name}.jpg')).finish()
 
+
 @command_shell.handle()
 async def _(event: GroupMessageEvent, arg: Message = CommandArg()):
     if event.group_id != 711674260:
         return
     result = subprocess.run(str(arg), shell=True, capture_output=True, text=True)
-    await UniMessage.text(f'Stdout:\n{result.stdout}').text(f'Stderr:\n{result.stderr}').text(f'ReturnCode:{result.returncode}').finish()
+    await UniMessage.text(f'Stdout:\n{result.stdout}').text(f'Stderr:\n{result.stderr}').text(
+        f'ReturnCode:{result.returncode}').finish()
+
 
 @command_count.handle()
 async def _(event: GroupMessageEvent, arg: Message = CommandArg()):
@@ -192,12 +200,28 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()):
         logger.error(e)
         await UniMessage.at(event.get_user_id()).text(e).finish()
 
+
 @command_exec.handle()
-async def _(event:GroupMessageEvent, arg:Message = CommandArg()):
+async def _(event: GroupMessageEvent, arg: Message = CommandArg()):
     if event.group_id != 711674260:
         return
     exec(str(arg))
     await UniMessage.text('执行完毕').finish()
+
+
+@command_captcha.handle()
+async def _(event: GroupMessageEvent, arg: Message = CommandArg()):
+    text = str(arg)
+    if len(text) <= 0:
+        return
+    if len(text) > 6:
+        await UniMessage.at(event.get_user_id()).text('验证码太长了！').finish()
+    legal_chars = string.digits + string.ascii_lowercase + string.ascii_uppercase
+    for i in text:
+        if i not in legal_chars:
+            await UniMessage.at(event.get_user_id()).text('仅允许大小写字母和数字').finish()
+    buf, _ = utils.generate_captcha_image(text=text)
+    await UniMessage.at(event.get_user_id()).image(raw=buf).finish()
 
 
 @echo.handle()
