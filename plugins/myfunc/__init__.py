@@ -36,7 +36,7 @@ command_point = on_command('指', priority=10, block=False, force_whitespace=' '
 command_bro = on_command('兄弟', priority=10, block=False, force_whitespace=' ')
 command_shell = on_command('shell', priority=10, block=False, force_whitespace=' ')
 command_count = on_command('count', priority=10, block=False, force_whitespace=' ')
-
+command_exec = on_command('exec', priority=10, block=False, force_whitespace=' ')
 @command_i_love_you.handle()
 async def _(event: GroupMessageEvent):
     await command_i_love_you.finish('你喜欢我')
@@ -191,6 +191,14 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()):
     except ValueError as e:
         logger.error(e)
         await UniMessage.at(event.get_user_id()).text(e).finish()
+
+@command_exec.handle()
+async def _(event:GroupMessageEvent, arg:Message = CommandArg()):
+    if event.group_id != 711674260:
+        return
+    exec(str(arg))
+    await UniMessage.text('执行完毕').finish()
+
 
 @echo.handle()
 async def _(event: Event):
