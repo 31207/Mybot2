@@ -44,7 +44,8 @@ command_captcha = on_command('验证码', priority=10, block=False, force_whites
 
 @command_i_love_you.handle()
 async def _(event: GroupMessageEvent):
-    await command_i_love_you.finish('你喜欢我')
+    # await command_i_love_you.finish('你喜欢我')
+    pass
 
 
 @command_mirror.got('arg1', prompt='请发送方向(左/上/右/下)')
@@ -226,7 +227,7 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()):
 
 @echo.handle()
 async def _(event: Event):
-    # print(utils.get_pic_urls(event.model_dump()))
+    # print(utils.get_pic_urls(event.1model_dump()))
     print(event.model_dump())
     if event.get_user_id() == '3579148268' and event.get_plaintext() == 'test':
         await UniMessage.image(raw=utils.get_bytes_from_file(f'{utils.plugin_path}/tmp/BG.jpg')).send()
