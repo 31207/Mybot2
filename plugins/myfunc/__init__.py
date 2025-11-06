@@ -233,6 +233,7 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()):
 
 @command_config.handle()
 async def _(event: GroupMessageEvent, arg: Message = CommandArg()):
+    print(event.get_user_id(),arg)
     if event.get_user_id() != '3579148268':
         return
     if arg == 'test':
