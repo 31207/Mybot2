@@ -40,6 +40,7 @@ command_shell = on_command('shell', priority=10, block=False, force_whitespace='
 command_count = on_command('count', priority=10, block=False, force_whitespace=' ')
 command_exec = on_command('exec', priority=10, block=False, force_whitespace=' ')
 command_captcha = on_command('验证码', priority=10, block=False, force_whitespace=' ')
+command_config = on_command('config', priority=10, block=False, force_whitespace=' ')
 
 
 @command_i_love_you.handle()
@@ -225,9 +226,34 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()):
     await UniMessage.at(event.get_user_id()).image(raw=buf).finish()
 
 
+'''
+    管理员控制config的更改
+'''
+
+
+@command_config.handle()
+async def _(event: GroupMessageEvent, arg: Message = CommandArg()):
+    if event.get_user_id() != '3579148268':
+        return
+    if arg == 'test':
+        await UniMessage.image(raw=utils.get_bytes_from_file(f'{utils.plugin_path}/tmp/BG.jpg')).finish()
+    if arg == 'output_model_dump':
+        config.output_model_dump = not config.output_model_dump
+        if config.output_model_dump:
+            await UniMessage.text('output_model_dump opening').finish()
+        else:
+            await UniMessage.text('output_model_dump closing').finish()
+    if arg == 'output_pic_and_at_count':
+        config.output_pic_and_at_count = not config.output_pic_and_at_count
+        if config.output_pic_and_at_count:
+            await UniMessage.text('output_pic_and_at_count opening').finish()
+        else:
+            await UniMessage.text('output_pic_and_at_count closing').finish()
+
+
 @echo.handle()
 async def _(event: Event):
-    logger.info(event.model_dump())
-    logger.info(f'pic:{utils.get_pic_urls(event.model_dump())},at:{utils.get_user_ids(event.model_dump())}')
-    if event.get_user_id() == '3579148268' and event.get_plaintext() == 'test':
-        await UniMessage.image(raw=utils.get_bytes_from_file(f'{utils.plugin_path}/tmp/BG.jpg')).send()
+    if config.output_model_dump:
+        logger.debug(event.model_dump())
+    if config.output_pic_and_at_count:
+        logger.info(f'pic:{utils.get_pic_urls(event.model_dump(), True)},at:{utils.get_user_ids(event.model_dump())}')
