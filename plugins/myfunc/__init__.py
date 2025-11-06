@@ -255,6 +255,6 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()):
 @echo.handle()
 async def _(event: Event):
     if config.output_model_dump:
-        logger.debug(event.model_dump())
+        logger.info(event.model_dump())
     if config.output_pic_and_at_count:
         logger.info(f'pic:{utils.get_pic_urls(event.model_dump(), True)},at:{utils.get_user_ids(event.model_dump())}')
