@@ -65,6 +65,7 @@ def split_and_mirror_gif(gif_path, output_path, direction:int):
     count = 0
     for frame in ImageSequence.Iterator(original_gif):
         new_frame = Image.new('RGBA', (width, height))
+        # empty_frame = Image.new('RGBA', (width,height))
         if direction == 0:
             left_half = frame.crop((0, 0, middle_width, height))
             mirrored_half = left_half.transpose(Image.FLIP_LEFT_RIGHT)
@@ -91,7 +92,7 @@ def split_and_mirror_gif(gif_path, output_path, direction:int):
             durations.append(frame.info['duration'])
         count+=1
 
-    if count!=1: frames[0].save(output_path, save_all=True, append_images=frames[1:], loop=0, duration=durations)
+    if count!=1: frames[0].save(output_path, save_all=True, append_images=frames[1:], loop=0, duration=durations, disposal=2)
     else: frames[0].save(output_path, save_all=True, append_images=frames[1:], loop=0)
 
 def generate_count_pic(count: int, output_file: str, theme: str = 'random'):
