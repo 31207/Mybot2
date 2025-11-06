@@ -9,16 +9,23 @@ from pathlib import Path
 plugin_path = os.path.dirname(os.path.abspath(__file__))
 
 """
-    传入event.model_dump()即可获取消息中图片url
+    向data传入event.model_dump()即可获取消息中图片url
+    include_reply: 是否在回复的原消息中获取图片url
 """
-def get_pic_urls(data: dict) -> tuple:
+def get_pic_urls(data: dict, include_reply: bool = False) -> tuple:
     res = []
     try:
         msg = data['original_message']
         for i in msg:
             if i['type'] == 'image':
                 res.append(i['data']['url'])
+        if data['reply'] is not None and include_reply:
+            msg = data['reply']['message']
+            for i in msg:
+                if i['type'] == 'image':
+                    res.append(i['data']['url'])
         return tuple(res)
+
     except:
         logger.warning('取消息中图片url失败')
         return ()
