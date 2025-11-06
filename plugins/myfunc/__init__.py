@@ -228,6 +228,6 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()):
 @echo.handle()
 async def _(event: Event):
     # print(utils.get_pic_urls(event.1model_dump()))
-    print(event.model_dump())
+    logger.info(f'pic:{utils.get_pic_urls()},at:{utils.get_user_ids()}')
     if event.get_user_id() == '3579148268' and event.get_plaintext() == 'test':
         await UniMessage.image(raw=utils.get_bytes_from_file(f'{utils.plugin_path}/tmp/BG.jpg')).send()
