@@ -236,15 +236,15 @@ async def _(event: GroupMessageEvent, arg: Message = CommandArg()):
     print(event.get_user_id(),arg)
     if event.get_user_id() != '3579148268':
         return
-    if arg == 'test':
+    if str(arg) == 'test':
         await UniMessage.image(raw=utils.get_bytes_from_file(f'{utils.plugin_path}/tmp/BG.jpg')).finish()
-    if arg == 'output_model_dump':
+    if str(arg) == 'output_model_dump':
         config.output_model_dump = not config.output_model_dump
         if config.output_model_dump:
             await UniMessage.text('output_model_dump opening').finish()
         else:
             await UniMessage.text('output_model_dump closing').finish()
-    if arg == 'output_pic_and_at_count':
+    if str(arg) == 'output_pic_and_at_count':
         config.output_pic_and_at_count = not config.output_pic_and_at_count
         if config.output_pic_and_at_count:
             await UniMessage.text('output_pic_and_at_count opening').finish()
